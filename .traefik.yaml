@@ -1,0 +1,18 @@
+# The name of your plugin as displayed in the Traefik Pilot web UI.
+displayName: Charon Passto
+
+# For now, `middleware` is the only type available.
+type: middleware
+
+# The import path of your plugin.
+import: github.com/0xDagal/charon-passto
+
+# A brief description of what your plugin is doing.
+summary: A middleware to interact with elasticsearch as part of the Charon Project
+
+# Configuration data for your plugin.
+# This is mandatory,
+# and Traefik Pilot will try to execute the plugin with the configuration you provide as part of its startup validity tests.
+testData:
+  Headers:
+    Foo: Bar
