@@ -1,7 +1,4 @@
----
-title: Charon Passto
-author: 0xDagal
----
+# Charon Passto
 
 ## What is it ?
 
