@@ -1,62 +1,96 @@
-// Package passto (an passto plugin).
 package passto
 
 import (
-    "context"
-    "net/http"
-    "encoding/json"
-    "strings"
-    "github.com/elastic/go-elasticsearch/v8"
+	"bytes"
+	"context"
+	"encoding/json"
+	"log"
+	"net/http"
+
+	"github.com/elastic/go-elasticsearch/v8"
+	"github.com/elastic/go-elasticsearch/v8/esapi"
 )
 
 // Config the plugin configuration.
-type Config struct { }
+type Config struct {
+	ES elasticsearch.Config
+}
 
 // passto a plugin.
 type Passto struct {
-    next     http.Handler
-    name     string
-    es       elasticsearch.Client
-}
-
-type Log struct {
-    Method      string
-    RemoteAddr  string
-    RequestURI  string
+	next http.Handler
+	name string
+	es   *elasticsearch.Client
 }
 
 // CreateConfig creates the default plugin configuration.
-func CreateConfig() *Config { return &Config{ } }
+func CreateConfig() *Config {
+	cfg := elasticsearch.Config{
+		Addresses: []string{
+			"http://localhost:9200",
+		},
+	}
+	return &Config{
+		ES: cfg,
+	}
+}
 
 // New created a new plugin.
 func New(ctx context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
-    cfg := elasticsearch.Config{
-        Addresses: []string{
-            "http://elasticsearch-master:9200",
-        },
-        Password: "changeme",
-    }
-    client, _ := elasticsearch.NewClient(cfg)
-    return &Passto{
-        next: next,
+	client, err := elasticsearch.NewClient(config.ES)
+	if err != nil {
+		log.Panicf("Could not create client: %s\n", err)
+	}
+	return &Passto{
+		next: next,
 		name: name,
-        es  : *client,
-    }, nil
+		es:   client,
+	}, nil
 }
 
 func (p *Passto) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-    rw.Write([]byte(req.RemoteAddr))
-    log := Log{
-        Method: req.Method,
-        RemoteAddr: req.RemoteAddr,
-        RequestURI: req.RequestURI,
-    }
-    json, _ := json.Marshal(log)
-    res, _ := p.es.Index(
-        "log",
-        strings.NewReader(string(json)),
-        p.es.Index.WithDocumentID("1"),
-        p.es.Index.WithRefresh("true"),
-    )
-    defer res.Body.Close()
+	type Log struct {
+		Method        string
+		Proto         string
+		ContentLength int64
+		Host          string
+		RemoteAddr    string
+		RequestURI    string
+	}
+	reqlog := Log{
+		Method:        req.Method,
+		Proto:         req.Proto,
+		ContentLength: req.ContentLength,
+		Host:          req.Host,
+		RemoteAddr:    req.RemoteAddr,
+		RequestURI:    req.RequestURI,
+	}
+	body, err := json.Marshal(reqlog)
+	if err != nil {
+		log.Panicf("Could not marshal body: %s\n", err)
+	}
+	esreq := esapi.IndexRequest{
+		Index:      "test",
+		DocumentID: "1",
+		Body:       bytes.NewReader(body),
+		Refresh:    "true",
+	}
+	res, err := esreq.Do(context.Background(), p.es)
+	if err != nil {
+		log.Panicf("Error getting response: %s", err)
+	}
+	defer res.Body.Close()
+	if res.IsError() {
+		var e map[string]interface{}
+		if err := json.NewDecoder(res.Body).Decode(&e); err != nil {
+			log.Panicf("Error parsing the response body: %s", err)
+		} else {
+			log.Panicf("[%s] %s: %s",
+				res.Status(),
+				e["error"].(map[string]interface{})["type"],
+				e["error"].(map[string]interface{})["reason"],
+			)
+		}
+	}
+	p.next.ServeHTTP(rw, req)
 }
