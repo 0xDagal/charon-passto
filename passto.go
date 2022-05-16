@@ -1,4 +1,4 @@
-package passto
+package charon_passto
 
 import (
 	"bytes"
@@ -27,7 +27,7 @@ type Passto struct {
 func CreateConfig() *Config {
 	cfg := elasticsearch.Config{
 		Addresses: []string{
-			"http://localhost:9200",
+			"http://elasticsearch-master:9200",
 		},
 	}
 	return &Config{
