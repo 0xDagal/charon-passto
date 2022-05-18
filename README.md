@@ -27,7 +27,7 @@ Static:
 
 [experimental.plugins.cache]
   modulename = "github.com/0xDagal/charon-passto"
-  version = "v0.2.1"
+  version = "v0.1.16"
 ```
 
 ```yaml
@@ -38,7 +38,7 @@ experimental:
   plugins:
     charon-passto:
       modulename = "github.com/0xDagal/charon-passto"
-      version = "v0.2.1"
+      version = "v0.1.16"
 ```
 
 Dynamic:
