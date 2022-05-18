@@ -27,18 +27,18 @@ Static:
 
 [experimental.plugins.cache]
   modulename = "github.com/0xDagal/charon-passto"
-  version = "v0.1.16"
+  version = "v0.1.17"
 ```
 
 ```yaml
 pilot:
-  token: 'xxx'
+  token: "6a58ead2-7028-4786-bbbb-5a181f22de0e"
 
 experimental:
   plugins:
     charon-passto:
-      modulename = "github.com/0xDagal/charon-passto"
-      version = "v0.1.16"
+      moduleName: "github.com/0xDagal/charon-passto"
+      version: "v0.1.7"
 ```
 
 Dynamic:
@@ -52,10 +52,11 @@ Dynamic:
 ```yaml
 http:
   middlewares:
-    passto:
+    my-passto:
       plugin:
         charon-passto:
           es-address: 'http://your-elastic-sever:port'
+
 ```
 
 ### Options
