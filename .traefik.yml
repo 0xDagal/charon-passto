@@ -14,5 +14,4 @@ summary: A middleware to interact with elasticsearch as part of the Charon Proje
 # This is mandatory,
 # and Traefik Pilot will try to execute the plugin with the configuration you provide as part of its startup validity tests.
 testData:
-  Headers:
-    Foo: Bar
+  es-address: 'http://elasticsearch-master:9200'

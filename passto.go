@@ -13,7 +13,7 @@ import (
 
 // Config the plugin configuration.
 type Config struct {
-	ES elasticsearch.Config
+    ESAddress string `json:"es-address" yaml:"es-address" toml:"es-address"`
 }
 
 // passto a plugin.
@@ -24,20 +24,16 @@ type Passto struct {
 }
 
 // CreateConfig creates the default plugin configuration.
-func CreateConfig() *Config {
-	cfg := elasticsearch.Config{
-		Addresses: []string{
-			"http://elasticsearch-master:9200",
-		},
-	}
-	return &Config{
-		ES: cfg,
-	}
-}
+func CreateConfig() *Config { return &Config{ } }
 
 // New created a new plugin.
 func New(ctx context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
-	client, err := elasticsearch.NewClient(config.ES)
+	cfg := elasticsearch.Config{
+		Addresses: []string{
+			config.ESAddress,
+		},
+	}
+	client, err := elasticsearch.NewClient(cfg)
 	if err != nil {
 		log.Panicf("Could not create client: %s\n", err)
 	}
@@ -49,6 +45,7 @@ func New(ctx context.Context, next http.Handler, config *Config, name string) (h
 }
 
 func (p *Passto) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+	p.next.ServeHTTP(rw, req)
 	type Log struct {
 		Method        string
 		Proto         string
@@ -92,5 +89,4 @@ func (p *Passto) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 			)
 		}
 	}
-	p.next.ServeHTTP(rw, req)
 }
