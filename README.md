@@ -46,7 +46,7 @@ Dynamic:
 ```toml
 [http.middlewares]
   [http.middlewares.my-passto.plugin.charon-passto]
-    es-address: 'http://elasticsearch-master:9200'
+    es-address = "http://elasticsearch-master:9200"
 ```
 
 ```yaml
@@ -55,7 +55,7 @@ http:
     passto:
       plugin:
         charon-passto:
-          es-address = "http://your-elastic-sever:port"
+          es-address: 'http://your-elastic-sever:port'
 ```
 
 ### Options
