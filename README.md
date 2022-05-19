@@ -27,18 +27,18 @@ Static:
 
 [experimental.plugins.cache]
   modulename = "github.com/0xDagal/charon-passto"
-  version = "v0.1.17"
+  version = "v0.1.18"
 ```
 
 ```yaml
 pilot:
-  token: "6a58ead2-7028-4786-bbbb-5a181f22de0e"
+  token: "xxx"
 
 experimental:
   plugins:
     charon-passto:
       moduleName: "github.com/0xDagal/charon-passto"
-      version: "v0.1.7"
+      version: "v0.1.8"
 ```
 
 Dynamic:
@@ -46,7 +46,7 @@ Dynamic:
 ```toml
 [http.middlewares]
   [http.middlewares.my-passto.plugin.charon-passto]
-    es-address = "http://elasticsearch-master:9200"
+    es-address = "http://your-elastic-sever:port"
 ```
 
 ```yaml
